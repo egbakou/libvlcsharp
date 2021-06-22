@@ -10,33 +10,40 @@ namespace LibVLCSharp.Forms.Platforms.iOS
 {
     /// <summary>
     /// Force orientation of iOS device.
-    /// In iOs client project, Developer should subscribe the AppDelegate.cs class to
-    /// all MessagingCenter below.
-    /// Refer to the sample LibVLCSharp.Forms.Sample.MediaElement for to see how to do it.
+    /// In iOS client project, Developer should override the GetSupportedInterfaceOrientations method.
+    /// Refer to the sample LibVLCSharp.Forms.Sample.MediaElement to see how to use it.
     /// </summary>
     public class OrientationHandler : IOrientationHandler
     {
+        private const string LandscapeMode = "Landscape";
+        private const string PortraitMode = "Portrait";
+        private const string LandscapeAndPortraitMode = "All";
+        private const string OrientationLabel = "orientation";
+        private const int IOSLandscapeLeftMode = (int)UIInterfaceOrientation.LandscapeLeft;
+        private const int IOSPortraitMode = (int)UIInterfaceOrientation.Portrait;
+
         /// <summary>
         /// Force Landscape mode.
         /// </summary>
         public void ForceLandscape()
         {
-            MessagingCenter.Send(this, "Landscape");
-            UIDevice.CurrentDevice.SetValueForKey(new NSNumber((int)UIInterfaceOrientation.LandscapeLeft), new NSString("orientation"));
+            MessagingCenter.Send(this, LandscapeMode);
+            UIDevice.CurrentDevice.SetValueForKey(new NSNumber(IOSLandscapeLeftMode), new NSString(OrientationLabel));
         }
+
         /// <summary>
         /// Force Portrait mode.
         /// </summary>
         public void ForcePortrait()
         {
-            MessagingCenter.Send(this, "Portrait");
-            UIDevice.CurrentDevice.SetValueForKey(new NSNumber((int)UIInterfaceOrientation.Portrait), new NSString("orientation"));
+            MessagingCenter.Send(this, PortraitMode);
+            UIDevice.CurrentDevice.SetValueForKey(new NSNumber(IOSPortraitMode), new NSString(OrientationLabel));
         }
 
         /// <summary>
         /// Restore Landscape and Portrait orientation mode.
         /// </summary>
-        public void ResetOrientation() => MessagingCenter.Send(this, "All");
+        public void ResetOrientation() => MessagingCenter.Send(this, LandscapeAndPortraitMode);
     }
 }
 #endif

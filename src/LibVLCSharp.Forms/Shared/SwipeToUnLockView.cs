@@ -10,12 +10,16 @@ namespace LibVLCSharp.Forms.Shared
     /// </summary>
     public class SwipeToUnLockView : AbsoluteLayout
     {
+        private const string ThumbPropertyName = "Thumb";
+        private const string TrackBarPropertyName = "TrackBar";
+        private const string FillBarPropertyName = "FillBar";
+
         /// <summary>
         /// Defines the ThumbProperty.
         /// </summary>
         public static readonly BindableProperty ThumbProperty =
             BindableProperty.Create(
-                "Thumb", typeof(View), typeof(SwipeToUnLockView),
+                ThumbPropertyName, typeof(View), typeof(SwipeToUnLockView),
                 defaultValue: default(View));
 
         /// <summary>
@@ -32,7 +36,7 @@ namespace LibVLCSharp.Forms.Shared
         /// </summary>
         public static readonly BindableProperty TrackBarProperty =
             BindableProperty.Create(
-                "TrackBar", typeof(View), typeof(SwipeToUnLockView),
+                TrackBarPropertyName, typeof(View), typeof(SwipeToUnLockView),
                 defaultValue: default(View));
 
         /// <summary>
@@ -49,7 +53,7 @@ namespace LibVLCSharp.Forms.Shared
         /// </summary>
         public static readonly BindableProperty FillBarProperty =
             BindableProperty.Create(
-                "FillBar", typeof(View), typeof(SwipeToUnLockView),
+                FillBarPropertyName, typeof(View), typeof(SwipeToUnLockView),
                 defaultValue: default(View));
 
         /// <summary>

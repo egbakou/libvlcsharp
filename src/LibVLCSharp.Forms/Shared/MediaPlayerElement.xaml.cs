@@ -247,7 +247,7 @@ namespace LibVLCSharp.Forms.Shared
         }
 
         /// <summary>
-        /// On size allocated , sucbribes the page to the lock screen message wich will be sent by PlaybackControls.cs.
+        /// On size allocated, subscribe the page to the lock screen message which will be sent by PlaybackControls.cs.
         /// </summary>
         /// <param name="width">Screen's with</param>
         /// <param name="height">Screen's height</param>
