@@ -7,31 +7,28 @@ namespace LibVLCSharp.Forms.Platforms.iOS
     /// <summary>
     /// Suscribes AppDelegate.cs to orientation change event.
     /// </summary>
-    public static class OrientationChangeSuscriber
+    public static class OrientationChangeListener
     {
         private static UIInterfaceOrientationMask OrientationMode;
 
         /// <summary>
         /// Susbscriber.
         /// </summary>
-        /// <param name="application">UIApplication from GetSupportedInterfaceOrientations method.</param>
-        /// <returns>the desired orientation to lock</returns>
-        public static UIInterfaceOrientationMask Suscribe(object application)
+        /// <param name="appDelegate">AppDelegate.</param>
+        /// <returns>The desired orientation to lock</returns>
+        public static UIInterfaceOrientationMask Subscribe(object appDelegate)
         {
-            MessagingCenter.Subscribe<OrientationHandler>(application, "Landscape", o =>
+            MessagingCenter.Subscribe<OrientationHandler>(appDelegate, "Landscape", o =>
             {
                 OrientationMode = UIInterfaceOrientationMask.Landscape;
-
             });
-            MessagingCenter.Subscribe<OrientationHandler>(application, "Portrait", o =>
+            MessagingCenter.Subscribe<OrientationHandler>(appDelegate, "Portrait", o =>
             {
                 OrientationMode = UIInterfaceOrientationMask.Portrait;
-
             });
-            MessagingCenter.Subscribe<OrientationHandler>(application, "All", o =>
+            MessagingCenter.Subscribe<OrientationHandler>(appDelegate, "All", o =>
             {
                 OrientationMode = UIInterfaceOrientationMask.All;
-
             });
 
             return OrientationMode;
