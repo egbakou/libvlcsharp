@@ -15,35 +15,23 @@ namespace LibVLCSharp.Forms.Platforms.iOS
     /// </summary>
     public class OrientationHandler : IOrientationHandler
     {
-        private const string LandscapeMode = "Landscape";
-        private const string PortraitMode = "Portrait";
-        private const string LandscapeAndPortraitMode = "All";
         private const string OrientationLabel = "orientation";
-        private const int IOSLandscapeLeftMode = (int)UIInterfaceOrientation.LandscapeLeft;
-        private const int IOSPortraitMode = (int)UIInterfaceOrientation.Portrait;
+        private const string LockLabel = "Lock";
+        private const string UnLockLabel = "UnLock";
 
         /// <summary>
-        /// Force Landscape mode.
+        /// Lock device's orientation.
         /// </summary>
-        public void ForceLandscape()
+        public void LockOrientation()
         {
-            MessagingCenter.Send(this, LandscapeMode);
-            UIDevice.CurrentDevice.SetValueForKey(new NSNumber(IOSLandscapeLeftMode), new NSString(OrientationLabel));
+            MessagingCenter.Send(this, LockLabel);
+            UIDevice.CurrentDevice.SetValueForKey(new NSNumber((int)UIDevice.CurrentDevice.Orientation), new NSString(OrientationLabel));
         }
 
         /// <summary>
-        /// Force Portrait mode.
+        /// Unlock device's orientation.
         /// </summary>
-        public void ForcePortrait()
-        {
-            MessagingCenter.Send(this, PortraitMode);
-            UIDevice.CurrentDevice.SetValueForKey(new NSNumber(IOSPortraitMode), new NSString(OrientationLabel));
-        }
-
-        /// <summary>
-        /// Restore Landscape and Portrait orientation mode.
-        /// </summary>
-        public void ResetOrientation() => MessagingCenter.Send(this, LandscapeAndPortraitMode);
+        public void UnLockOrientation() => MessagingCenter.Send(this, UnLockLabel);
     }
 }
 #endif

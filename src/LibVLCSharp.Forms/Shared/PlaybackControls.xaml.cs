@@ -764,7 +764,7 @@ namespace LibVLCSharp.Forms.Shared
                 SwipeToUnLock.SlideCompleted += Handle_SlideCompletedAsync;
 
             if (OrientationHandler != null)
-                OrientationHandler.ResetOrientation();
+                OrientationHandler.UnLockOrientation();
 
             VisualStateManager.GoToState(PlayPauseButton, Manager.Get<StateManager>().IsPlaying ? PauseState : PlayState);
             UpdateSeekAvailability();
@@ -1227,11 +1227,9 @@ namespace LibVLCSharp.Forms.Shared
         private async void LockButton_ClickedAsync(object sender, EventArgs e)
         {
             ScreenLockModeEnable = true;
-            var orientationHandler = OrientationHandler;
-            if (orientationHandler != null)
+            if (OrientationHandler != null)
             {
-                // Send a message [to the main view (MediaPlayerElement.cs)]
-                MessagingCenter.Send(this, "ChangeOrientation");
+                OrientationHandler.LockOrientation();
             }
             await FadeOutAsync();
         }
@@ -1244,10 +1242,9 @@ namespace LibVLCSharp.Forms.Shared
         private async void Handle_SlideCompletedAsync(object sender, EventArgs e)
         {
             ScreenLockModeEnable = false;
-            var orientationHandler = OrientationHandler;
-            if (orientationHandler != null)
+            if (OrientationHandler != null)
             {
-                orientationHandler.ResetOrientation();
+                OrientationHandler.UnLockOrientation();
             }
             await FadeInAsync();
         }

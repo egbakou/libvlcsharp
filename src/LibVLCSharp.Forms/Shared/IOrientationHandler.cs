@@ -6,18 +6,13 @@
     public interface IOrientationHandler
     {
         /// <summary>
-        /// Force Landscape orientation mode.
+        /// Lock device's orientation.
         /// </summary>
-        void ForceLandscape();
+        void LockOrientation();
 
         /// <summary>
-        /// Force Portrait orientation mode.
+        /// Unlock device's orientation.
         /// </summary>
-        void ForcePortrait();
-
-        /// <summary>
-        /// Restore Landscape and Portrait orientation mode.
-        /// </summary>
-        void ResetOrientation();
+        void UnLockOrientation();
     }
 }
