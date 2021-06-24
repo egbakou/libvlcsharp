@@ -47,7 +47,7 @@ namespace MyAppNameSpace.iOS
 
         public override UIInterfaceOrientationMask GetSupportedInterfaceOrientations(UIApplication application, [Transient] UIWindow forWindow)
         {
-            return OrientationChangeSuscriber.Suscribe(this);
+            return OrientationChangeListener.Subscribe(this);
         }
     }
 }
