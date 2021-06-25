@@ -18,7 +18,9 @@ namespace LibVLCSharp.Forms.Shared
     public partial class PlaybackControls : TemplatedView
     {
         private const string AudioSelectionAvailableState = "AudioSelectionAvailable";
+        private const string VideoSelectionAvailableState = "VideoSelectionAvailable";
         private const string AudioSelectionUnavailableState = "AudioSelectionUnavailable";
+        private const string VideoSelectionUnavailableState = "videoSelectionUnavailable";
         private const string ClosedCaptionsSelectionAvailableState = "ClosedCaptionsSelectionAvailable";
         private const string ClosedCaptionsSelectionUnavailableState = "ClosedCaptionsSelectionUnavailable";
         private const string PlayState = "PlayState";
@@ -41,6 +43,7 @@ namespace LibVLCSharp.Forms.Shared
             Foreground = (Color)(Resources[nameof(Foreground)] ?? Color.White);
             MainColor = (Color)(Resources[nameof(MainColor)] ?? Color.Transparent);
             AudioTracksSelectionButtonStyle = Resources[nameof(AudioTracksSelectionButtonStyle)] as Style;
+            VideoTracksSelectionButtonStyle = Resources[nameof(VideoTracksSelectionButtonStyle)] as Style;
             BufferingProgressBarStyle = Resources[nameof(BufferingProgressBarStyle)] as Style;
             ButtonBarStyle = Resources[nameof(ButtonBarStyle)] as Style;
             CastButtonStyle = Resources[nameof(CastButtonStyle)] as Style;
@@ -68,6 +71,10 @@ namespace LibVLCSharp.Forms.Shared
             audioTrackManager.TrackAdded += OnAudioTracksChanged;
             audioTrackManager.TrackDeleted += OnAudioTracksChanged;
             audioTrackManager.TracksCleared += OnAudioTracksChanged;
+            var videoTrackManager = Manager.Get<VideoTracksManager>();
+            videoTrackManager.TrackAdded += OnVideoTracksChanged;
+            videoTrackManager.TrackDeleted += OnVideoTracksChanged;
+            videoTrackManager.TracksCleared += OnVideoTracksChanged;
             var subTitlesTrackManager = Manager.Get<SubtitlesTracksManager>();
             subTitlesTrackManager.TrackAdded += OnSubtitlesTracksChanged;
             subTitlesTrackManager.TrackDeleted += OnSubtitlesTracksChanged;
@@ -99,6 +106,7 @@ namespace LibVLCSharp.Forms.Shared
 
         private MediaPlayerElementManager Manager { get; }
         private Button? AudioTracksSelectionButton { get; set; }
+        private Button? VideoTracksSelectionButton { get; set; }
         private Button? CastButton { get; set; }
         private Button? ClosedCaptionsSelectionButton { get; set; }
         private VisualElement? ControlsPanel { get; set; }
@@ -177,6 +185,20 @@ namespace LibVLCSharp.Forms.Shared
         {
             get => (Style)GetValue(AudioTracksSelectionButtonStyleProperty);
             set => SetValue(AudioTracksSelectionButtonStyleProperty, value);
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="VideoTracksSelectionButtonStyle"/> dependency property.
+        /// </summary>
+        public static readonly BindableProperty VideoTracksSelectionButtonStyleProperty = BindableProperty.Create(
+            nameof(VideoTracksSelectionButtonStyle), typeof(Style), typeof(PlaybackControls));
+        /// <summary>
+        /// Gets or sets the audio tracks selection button style.
+        /// </summary>
+        public Style? VideoTracksSelectionButtonStyle
+        {
+            get => (Style)GetValue(VideoTracksSelectionButtonStyleProperty);
+            set => SetValue(VideoTracksSelectionButtonStyleProperty, value);
         }
 
         /// <summary>
@@ -591,6 +613,21 @@ namespace LibVLCSharp.Forms.Shared
         }
 
         /// <summary>
+        /// Identifies the <see cref="IsVideoTracksSelectionButtonVisible"/> dependency property.
+        /// </summary>
+        public static readonly BindableProperty IsVideoTracksSelectionButtonVisibleProperty = BindableProperty.Create(
+            nameof(IsVideoTracksSelectionButtonVisible), typeof(bool), typeof(PlaybackControls), true,
+            propertyChanged: IsVideoTracksSelectionButtonVisiblePropertyChanged);
+        /// <summary>
+        /// Gets or sets a value indicating whether the audio tracks selection button is shown.
+        /// </summary>
+        public bool IsVideoTracksSelectionButtonVisible
+        {
+            get => (bool)GetValue(IsVideoTracksSelectionButtonVisibleProperty);
+            set => SetValue(IsVideoTracksSelectionButtonVisibleProperty, value);
+        }
+
+        /// <summary>
         /// Identifies the <see cref="IsCastButtonVisible"/> dependency property.
         /// </summary>
         public static readonly BindableProperty IsCastButtonVisibleProperty = BindableProperty.Create(nameof(IsCastButtonVisible), typeof(bool),
@@ -733,6 +770,7 @@ namespace LibVLCSharp.Forms.Shared
         private void OnApplyCustomTemplate()
         {
             AudioTracksSelectionButton = SetClickEventHandler(nameof(AudioTracksSelectionButton), AudioTracksSelectionButton_ClickedAsync);
+            VideoTracksSelectionButton = SetClickEventHandler(nameof(VideoTracksSelectionButton), VideoTracksSelectionButton_ClickedAsync);
             CastButton = SetClickEventHandler(nameof(CastButton), CastButton_ClickedAsync);
             ClosedCaptionsSelectionButton = SetClickEventHandler(nameof(ClosedCaptionsSelectionButton), ClosedCaptionsSelectionButton_ClickedAsync);
             PlayPauseButton = SetClickEventHandler(nameof(PlayPauseButton), PlayPauseButton_Clicked);
@@ -769,6 +807,7 @@ namespace LibVLCSharp.Forms.Shared
             VisualStateManager.GoToState(PlayPauseButton, Manager.Get<StateManager>().IsPlaying ? PauseState : PlayState);
             UpdateSeekAvailability();
             UpdateAudioTracksSelectionAvailability();
+            UpdateVideoTracksSelectionAvailability();
             UpdateClosedCaptionsTracksSelectionAvailability();
             UpdatePauseAvailability();
             UpdateTime();
@@ -778,6 +817,11 @@ namespace LibVLCSharp.Forms.Shared
         private static void IsAudioTracksSelectionButtonVisiblePropertyChanged(BindableObject bindable, object oldValue, object newValue)
         {
             ((PlaybackControls)bindable).UpdateAudioTracksSelectionAvailability();
+        }
+
+        private static void IsVideoTracksSelectionButtonVisiblePropertyChanged(BindableObject bindable, object oldValue, object newValue)
+        {
+            ((PlaybackControls)bindable).UpdateVideoTracksSelectionAvailability();
         }
 
         private static void IsClosedCaptionsSelectionButtonVisiblePropertyChanged(BindableObject bindable, object oldValue, object newValue)
@@ -821,6 +865,11 @@ namespace LibVLCSharp.Forms.Shared
             UpdateAudioTracksSelectionAvailability();
         }
 
+        private void OnVideoTracksChanged(object sender, EventArgs e)
+        {
+            UpdateVideoTracksSelectionAvailability();
+        }
+
         private void OnSubtitlesTracksChanged(object sender, EventArgs e)
         {
             UpdateClosedCaptionsTracksSelectionAvailability();
@@ -829,6 +878,11 @@ namespace LibVLCSharp.Forms.Shared
         private async void AudioTracksSelectionButton_ClickedAsync(object sender, EventArgs e)
         {
             await SelectTrackAsync(Manager.Get<AudioTracksManager>(), ResourceManager.GetString(nameof(Strings.AudioTracks)));
+        }
+
+        private async void VideoTracksSelectionButton_ClickedAsync(object sender, EventArgs e)
+        {
+            await SelectTrackAsync(Manager.Get<VideoTracksManager>(), ResourceManager.GetString(nameof(Strings.VideoTracks)));
         }
 
         private async void CastButton_ClickedAsync(object sender, EventArgs e)
@@ -1057,6 +1111,12 @@ namespace LibVLCSharp.Forms.Shared
         {
             UpdateTracksSelectionAvailability(Manager.Get<AudioTracksManager>(), AudioTracksSelectionButton, IsAudioTracksSelectionButtonVisible,
                 AudioSelectionAvailableState, AudioSelectionUnavailableState, 2);
+        }
+
+        private void UpdateVideoTracksSelectionAvailability()
+        {
+            UpdateTracksSelectionAvailability(Manager.Get<VideoTracksManager>(), VideoTracksSelectionButton, IsVideoTracksSelectionButtonVisible,
+                VideoSelectionAvailableState, VideoSelectionUnavailableState, 2);
         }
 
         private void UpdateClosedCaptionsTracksSelectionAvailability()

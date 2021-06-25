@@ -148,6 +148,24 @@
         </Setter>
     </Style>
 
+    <Style x:Key="VideoTracksSelectionButtonStyle" BasedOn="{StaticResource ButtonStyle}" TargetType="Button">
+        <Setter Property="IsVisible" Value="{TemplateBinding IsVideoTracksSelectionButtonVisible}" />
+        <Setter Property="FontFamily" Value="{StaticResource FontAwesomeRegular}" />
+        <Setter Property="Text" Value="{x:Static fontawesome:FontAwesomeIcons.FileVideo}" />
+        <Setter Property="VisualStateManager.VisualStateGroups">
+            <VisualStateGroupList>
+                <VisualStateGroup x:Name="VideoSelectionAvailabilityStates">
+                    <VisualState x:Name="VideoSelectionAvailable">
+                        <VisualState.Setters>
+                            <Setter Property="IsVisible" Value="True" />
+                        </VisualState.Setters>
+                    </VisualState>
+                    <VisualState x:Name="VideoSelectionUnavailable" />
+                </VisualStateGroup>
+            </VisualStateGroupList>
+        </Setter>
+    </Style>
+
     <Style x:Key="CastButtonStyle" BasedOn="{StaticResource ButtonStyle}" TargetType="Button">
         <Setter Property="IsVisible" Value="False" />
         <Setter Property="FontFamily" Value="{StaticResource FontAwesomeBrands}" />
@@ -278,6 +296,7 @@
                             </StackLayout>
                             <ContentPresenter Content="{TemplateBinding ButtonBarEndArea}" HorizontalOptions="End" VerticalOptions="Center" />
                             <StackLayout Orientation="Horizontal" HorizontalOptions="End" VerticalOptions="Center">
+                                <Button x:Name="VideoTracksSelectionButton" Style="{TemplateBinding VideoTracksSelectionButtonStyle}" />
                                 <Button x:Name="AspectRatioButton" Style="{TemplateBinding AspectRatioButtonStyle}" />
                                 <Button x:Name="CastButton" Style="{TemplateBinding CastButtonStyle}" />
                             </StackLayout>

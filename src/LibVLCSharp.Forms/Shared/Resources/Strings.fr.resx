@@ -141,4 +141,7 @@
   <data name="Unlock" xml:space="preserve">
     <value>DÉVERROUILLER</value>
   </data>
+  <data name="VideoTracks" xml:space="preserve">
+    <value>Pistes vidéo</value>
+  </data>
 </root>
