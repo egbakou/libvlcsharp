@@ -9,7 +9,7 @@ namespace LibVLCSharp.Forms.Platforms.iOS
     /// </summary>
     public static class OrientationChangeListener
     {
-        private static UIInterfaceOrientationMask OrientationMode;
+        private static UIInterfaceOrientationMask? OrientationMode = null;
 
         /// <summary>
         /// Susbscriber.
@@ -17,17 +17,20 @@ namespace LibVLCSharp.Forms.Platforms.iOS
         /// <param name="appDelegate">AppDelegate.</param>
         /// <returns>The desired orientation to lock.</returns>
         public static UIInterfaceOrientationMask Subscribe(object appDelegate)
-        {           
-            MessagingCenter.Subscribe<OrientationHandler>(appDelegate, "Lock", o =>
+        {
+            if (OrientationMode == null)
             {
-                OrientationMode = ConvertToOrientationToMask(UIDevice.CurrentDevice.Orientation);
-            });
-            MessagingCenter.Subscribe<OrientationHandler>(appDelegate, "UnLock", o =>
-            {
-                OrientationMode = UIInterfaceOrientationMask.All;
-            });
+                MessagingCenter.Subscribe<OrientationHandler>(appDelegate, "Lock", o =>
+                {
+                    OrientationMode = ConvertToOrientationToMask(UIDevice.CurrentDevice.Orientation);
+                });
+                MessagingCenter.Subscribe<OrientationHandler>(appDelegate, "UnLock", o =>
+                {
+                    OrientationMode = UIInterfaceOrientationMask.All;
+                });
+            }
 
-            return OrientationMode;
+            return (OrientationMode == null) ? UIInterfaceOrientationMask.All : OrientationMode.GetValueOrDefault();
         }
 
         /// <summary>
