@@ -12,7 +12,7 @@
     <Color x:Key="Foreground">White</Color>
     <Color x:Key="MainColor">#E57A00</Color>
     <Color x:Key="ButtonColor">#A0E57A00</Color>
-    
+
     <OnPlatform x:TypeArguments="x:String"
                           x:Key="FontAwesomeBrands">
         <On Platform="Android"
@@ -88,7 +88,7 @@
         </Setter>
     </Style>
 
-        
+
     <Style x:Key="ElapsedTimeLabelStyle" TargetType="Label">
         <Setter Property="HorizontalOptions" Value="StartAndExpand" />
         <Setter Property="Margin" Value="15,15,15,0" />
@@ -143,6 +143,24 @@
                         </VisualState.Setters>
                     </VisualState>
                     <VisualState x:Name="AudioSelectionUnavailable" />
+                </VisualStateGroup>
+            </VisualStateGroupList>
+        </Setter>
+    </Style>
+
+    <Style x:Key="VideoTracksSelectionButtonStyle" BasedOn="{StaticResource ButtonStyle}" TargetType="Button">
+        <Setter Property="IsVisible" Value="{TemplateBinding IsVideoTracksSelectionButtonVisible}" />
+        <Setter Property="FontFamily" Value="{StaticResource FontAwesomeRegular}" />
+        <Setter Property="Text" Value="{x:Static fontawesome:FontAwesomeIcons.FileVideo}" />
+        <Setter Property="VisualStateManager.VisualStateGroups">
+            <VisualStateGroupList>
+                <VisualStateGroup x:Name="VideoSelectionAvailabilityStates">
+                    <VisualState x:Name="VideoSelectionAvailable">
+                        <VisualState.Setters>
+                            <Setter Property="IsVisible" Value="True" />
+                        </VisualState.Setters>
+                    </VisualState>
+                    <VisualState x:Name="VideoSelectionUnavailable" />
                 </VisualStateGroup>
             </VisualStateGroupList>
         </Setter>
@@ -220,7 +238,7 @@
     <Style x:Key="LockButtonStyle" BasedOn="{StaticResource ButtonStyle}" TargetType="Button">
         <Setter Property="Text" Value="{x:Static fontawesome:FontAwesomeIcons.UnlockAlt}" />
     </Style>
-    
+
     <Style x:Key="UnLockButtonStyle" BasedOn="{StaticResource ButtonStyle}" TargetType="Button">
         <Setter Property="Text" Value="{x:Static fontawesome:FontAwesomeIcons.Lock}" />
     </Style>
@@ -229,7 +247,7 @@
         <Setter Property="IsVisible" Value="{TemplateBinding IsAspectRatioButtonVisible}" />
         <Setter Property="Text" Value="{x:Static fontawesome:FontAwesomeIcons.ExpandArrowsAlt}" />
     </Style>
-    
+
     <Style x:Key="RewindButtonStyle" BasedOn="{StaticResource ButtonStyle}" TargetType="Button">
         <Setter Property="IsVisible" Value="{TemplateBinding IsRewindButtonVisible}" />
         <Setter Property="Text" Value="{x:Static fontawesome:FontAwesomeIcons.Backward}" />
@@ -239,7 +257,7 @@
         <Setter Property="IsVisible" Value="{TemplateBinding IsSeekButtonVisible}" />
         <Setter Property="Text" Value="{x:Static fontawesome:FontAwesomeIcons.Forward}" />
     </Style>
-        
+
     <Style x:Key="PlaybackControlsStyle" TargetType="TemplatedView">
         <Setter Property="ControlTemplate">
             <ControlTemplate>
@@ -278,6 +296,7 @@
                             </StackLayout>
                             <ContentPresenter Content="{TemplateBinding ButtonBarEndArea}" HorizontalOptions="End" VerticalOptions="Center" />
                             <StackLayout Orientation="Horizontal" HorizontalOptions="End" VerticalOptions="Center">
+                                <Button x:Name="VideoTracksSelectionButton" Style="{TemplateBinding VideoTracksSelectionButtonStyle}" />
                                 <Button x:Name="AspectRatioButton" Style="{TemplateBinding AspectRatioButtonStyle}" />
                                 <Button x:Name="CastButton" Style="{TemplateBinding CastButtonStyle}" />
                             </StackLayout>
@@ -302,7 +321,7 @@
                             </local:SwipeToUnLockView.FillBar>
                         </local:SwipeToUnLockView>
                     </StackLayout>
-                    
+
                 </StackLayout>
             </ControlTemplate>
         </Setter>

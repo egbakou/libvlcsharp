@@ -162,4 +162,7 @@
   <data name="Unlock" xml:space="preserve">
     <value>SWIPE TO UNLOCK</value>
   </data>
+  <data name="VideoTracks" xml:space="preserve">
+    <value>Video tracks</value>
+  </data>
 </root>

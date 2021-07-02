@@ -194,5 +194,14 @@ namespace LibVLCSharp.Forms.Shared.Resources {
                 return ResourceManager.GetString("Unlock", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Video tracks.
+        /// </summary>
+        internal static string VideoTracks {
+            get {
+                return ResourceManager.GetString("VideoTracks", resourceCulture);
+            }
+        }
     }
 }
