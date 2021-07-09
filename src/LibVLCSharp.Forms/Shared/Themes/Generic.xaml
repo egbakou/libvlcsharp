@@ -4,6 +4,7 @@
                     xmlns:converters="clr-namespace:LibVLCSharp.Forms.Shared.Converters"
                     xmlns:effects="clr-namespace:LibVLCSharp.Forms.Shared.Effects"
                     xmlns:fontawesome="clr-namespace:FontAwesome;assembly=LibVLCSharp"
+                    xmlns:controls="clr-namespace:LibVLCSharp.Forms.Shared"
                     xmlns:local="clr-namespace:LibVLCSharp.Forms.Shared"
                     x:Class="LibVLCSharp.Forms.Shared.Themes.Generic">
     <converters:BufferingProgressToBoolConverter x:Key="BufferingProgressToBoolConverter" />
@@ -243,6 +244,10 @@
         <Setter Property="Text" Value="{x:Static fontawesome:FontAwesomeIcons.Lock}" />
     </Style>
 
+    <Style x:Key="TracksButtonStyle" BasedOn="{StaticResource ButtonStyle}" TargetType="Button">
+        <Setter Property="Text" Value="{x:Static fontawesome:FontAwesomeIcons.File}" />
+    </Style>
+
     <Style x:Key="AspectRatioButtonStyle" BasedOn="{StaticResource ButtonStyle}" TargetType="Button">
         <Setter Property="IsVisible" Value="{TemplateBinding IsAspectRatioButtonVisible}" />
         <Setter Property="Text" Value="{x:Static fontawesome:FontAwesomeIcons.ExpandArrowsAlt}" />
@@ -283,9 +288,8 @@
                         </StackLayout>
                         <StackLayout x:Name="ButtonBar" Orientation="Horizontal" Style="{TemplateBinding ButtonBarStyle}">
                             <StackLayout Orientation="Horizontal" HorizontalOptions="Start" VerticalOptions="Center">
-                                <Button x:Name="AudioTracksSelectionButton" Style="{TemplateBinding AudioTracksSelectionButtonStyle}" />
-                                <Button x:Name="ClosedCaptionsSelectionButton" Style="{TemplateBinding ClosedCaptionsSelectionButtonStyle}" />
                                 <Button x:Name="LockButton" Style="{StaticResource LockButtonStyle}" />
+                                <Button x:Name="TracksButton" Style="{StaticResource TracksButtonStyle}" />
                             </StackLayout>
                             <ContentPresenter Content="{TemplateBinding ButtonBarStartArea}" HorizontalOptions="Start" VerticalOptions="Center" />
                             <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand" VerticalOptions="Center">
@@ -296,12 +300,20 @@
                             </StackLayout>
                             <ContentPresenter Content="{TemplateBinding ButtonBarEndArea}" HorizontalOptions="End" VerticalOptions="Center" />
                             <StackLayout Orientation="Horizontal" HorizontalOptions="End" VerticalOptions="Center">
-                                <Button x:Name="VideoTracksSelectionButton" Style="{TemplateBinding VideoTracksSelectionButtonStyle}" />
                                 <Button x:Name="AspectRatioButton" Style="{TemplateBinding AspectRatioButtonStyle}" />
                                 <Button x:Name="CastButton" Style="{TemplateBinding CastButtonStyle}" />
                             </StackLayout>
                         </StackLayout>
                     </StackLayout>
+
+                    <!-- OverLay View -->
+                    <controls:OverlayView x:Name="TracksOverLayView" IsVisible="False" BackgroundColor="#30000000" OverlayBackgroundColor="#30000000" HeightRequest="120" HorizontalOptions="FillAndExpand" Opacity="1" OverlayOpacity="1" Scale="1" ShowOverlay="True" VerticalOptions="Start">
+                        <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand" VerticalOptions="Start">
+                            <Button x:Name="AudioTracksSelectionButton" Style="{TemplateBinding AudioTracksSelectionButtonStyle}" />
+                            <Button x:Name="ClosedCaptionsSelectionButton" Style="{TemplateBinding ClosedCaptionsSelectionButtonStyle}" />
+                            <Button x:Name="VideoTracksSelectionButton" Style="{TemplateBinding VideoTracksSelectionButtonStyle}" />
+                        </StackLayout>
+                    </controls:OverlayView>
 
                     <!--  Unlock Control View  -->
                     <StackLayout x:Name="UnLockControlsPanel" Style="{TemplateBinding UnLockControlsPanelStyle}" IsVisible="False">
@@ -321,7 +333,6 @@
                             </local:SwipeToUnLockView.FillBar>
                         </local:SwipeToUnLockView>
                     </StackLayout>
-
                 </StackLayout>
             </ControlTemplate>
         </Setter>

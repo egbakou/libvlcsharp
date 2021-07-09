@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Resources;
 using System.Threading.Tasks;
 using LibVLCSharp.Forms.Shared.Resources;
@@ -42,6 +41,7 @@ namespace LibVLCSharp.Forms.Shared
             ButtonColor = (Color)(Resources[nameof(ButtonColor)] ?? Color.Transparent);
             Foreground = (Color)(Resources[nameof(Foreground)] ?? Color.White);
             MainColor = (Color)(Resources[nameof(MainColor)] ?? Color.Transparent);
+            TracksButtonStyle = Resources[nameof(TracksButtonStyle)] as Style;
             AudioTracksSelectionButtonStyle = Resources[nameof(AudioTracksSelectionButtonStyle)] as Style;
             VideoTracksSelectionButtonStyle = Resources[nameof(VideoTracksSelectionButtonStyle)] as Style;
             BufferingProgressBarStyle = Resources[nameof(BufferingProgressBarStyle)] as Style;
@@ -93,7 +93,7 @@ namespace LibVLCSharp.Forms.Shared
             stateManager.Playing += (sender, e) => OnPlaying();
             stateManager.Paused += (sender, e) => OnStoppedOrPaused();
             stateManager.Stopped += (sender, e) => OnStoppedOrPaused();
-            stateManager.PlayPauseAvailableChanged += (sender, e) => UpdatePauseAvailability();
+            stateManager.PlayPauseAvailableChanged += (sender, e) => UpdatePauseAvailability();         
         }
 
         /// <summary>
@@ -106,12 +106,14 @@ namespace LibVLCSharp.Forms.Shared
 
         private MediaPlayerElementManager Manager { get; }
         private Button? AudioTracksSelectionButton { get; set; }
+        private Button? TracksButton { get; set; }
         private Button? VideoTracksSelectionButton { get; set; }
         private Button? CastButton { get; set; }
         private Button? ClosedCaptionsSelectionButton { get; set; }
         private VisualElement? ControlsPanel { get; set; }
         private VisualElement? ButtonBar { get; set; }
         private VisualElement? UnLockControlsPanel { get; set; }
+        private VisualElement? TracksOverLayView { get; set; }
         private SwipeToUnLockView? SwipeToUnLock { get; set; }
         private Label? TrackBarLabel { get; set; }
         private Button? PlayPauseButton { get; set; }
@@ -171,6 +173,20 @@ namespace LibVLCSharp.Forms.Shared
         {
             get => (Color)GetValue(MainColorProperty);
             set => SetValue(MainColorProperty, value);
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="TracksButtonStyle"/> dependency property.
+        /// </summary>
+        public static readonly BindableProperty TracksButtonStyleProperty = BindableProperty.Create(
+            nameof(TracksButtonStyle), typeof(Style), typeof(PlaybackControls));
+        /// <summary>
+        /// Gets or sets the tracks button style.
+        /// </summary>
+        public Style? TracksButtonStyle
+        {
+            get => (Style)GetValue(TracksButtonStyleProperty);
+            set => SetValue(TracksButtonStyleProperty, value);
         }
 
         /// <summary>
@@ -769,6 +785,7 @@ namespace LibVLCSharp.Forms.Shared
 
         private void OnApplyCustomTemplate()
         {
+            TracksButton = SetClickEventHandler(nameof(TracksButton), TracksButton_Clicked);
             AudioTracksSelectionButton = SetClickEventHandler(nameof(AudioTracksSelectionButton), AudioTracksSelectionButton_ClickedAsync);
             VideoTracksSelectionButton = SetClickEventHandler(nameof(VideoTracksSelectionButton), VideoTracksSelectionButton_ClickedAsync);
             CastButton = SetClickEventHandler(nameof(CastButton), CastButton_ClickedAsync);
@@ -780,6 +797,7 @@ namespace LibVLCSharp.Forms.Shared
             ControlsPanel = this.FindChild<VisualElement?>(nameof(ControlsPanel));
             ButtonBar = this.FindChild<VisualElement?>(nameof(ButtonBar));
             UnLockControlsPanel = this.FindChild<VisualElement?>(nameof(UnLockControlsPanel));
+            TracksOverLayView = this.FindChild<VisualElement?>(nameof(TracksOverLayView));
             SwipeToUnLock = this.FindChild<SwipeToUnLockView?>(nameof(SwipeToUnLock));
             SeekBar = this.FindChild<Slider?>(nameof(SeekBar));
             TrackBarLabel = this.FindChild<Label?>(nameof(TrackBarLabel));
@@ -875,10 +893,19 @@ namespace LibVLCSharp.Forms.Shared
             UpdateClosedCaptionsTracksSelectionAvailability();
         }
 
+        private void TracksButton_Clicked(object sender, EventArgs e)
+        {
+            if(ButtonBar != null && TracksOverLayView != null)
+            {
+                ButtonBar.IsVisible = false;
+                TracksOverLayView.IsVisible = true;
+            }
+        }
+
         private async void AudioTracksSelectionButton_ClickedAsync(object sender, EventArgs e)
         {
             await SelectTrackAsync(Manager.Get<AudioTracksManager>(), ResourceManager.GetString(nameof(Strings.AudioTracks)));
-        }
+        }        
 
         private async void VideoTracksSelectionButton_ClickedAsync(object sender, EventArgs e)
         {
@@ -932,9 +959,6 @@ namespace LibVLCSharp.Forms.Shared
                 OnShowAndHideAutomaticallyPropertyChanged();
             }
             Show();
-
-
-
         }
 
         private async void ClosedCaptionsSelectionButton_ClickedAsync(object sender, EventArgs e)
@@ -971,7 +995,6 @@ namespace LibVLCSharp.Forms.Shared
             {
                 ShowErrorMessageBox(ex);
             }
-
         }
 
         private void RewindButton_Clicked(object sender, EventArgs e)
@@ -1028,7 +1051,7 @@ namespace LibVLCSharp.Forms.Shared
         private void OnStoppedOrPaused()
         {
             VisualStateManager.GoToState(PlayPauseButton, PlayState);
-        }
+        }            
 
         private string? GetTrackName(string? trackName, int trackId, int currentTrackId)
         {
@@ -1239,7 +1262,7 @@ namespace LibVLCSharp.Forms.Shared
         private async Task FadeInAsync()
         {
             var controlsPanel = ControlsPanel;
-            if (controlsPanel != null && SeekBar != null && ButtonBar != null && UnLockControlsPanel != null)
+            if (controlsPanel != null && SeekBar != null && ButtonBar != null && UnLockControlsPanel != null && TracksOverLayView != null)
             {
                 controlsPanel.IsVisible = true;
                 SeekBar.IsVisible = true;
@@ -1247,6 +1270,9 @@ namespace LibVLCSharp.Forms.Shared
                 SeekBar.IsEnabled = !ScreenLockModeEnable;
                 ButtonBar.IsVisible = !ScreenLockModeEnable;
                 UnLockControlsPanel.IsVisible = ScreenLockModeEnable;
+
+                if (TracksOverLayView.IsVisible)
+                    TracksOverLayView.IsVisible = false;
 
                 if (controlsPanel.Opacity != 1)
                 {
