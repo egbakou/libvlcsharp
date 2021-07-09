@@ -133,7 +133,7 @@ namespace LibVLCSharp.Forms.Shared.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Closed captions.
+        ///   Looks up a localized string similar to Subtitles.
         /// </summary>
         internal static string ClosedCaptions {
             get {

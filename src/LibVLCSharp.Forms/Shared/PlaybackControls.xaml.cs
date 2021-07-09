@@ -1,10 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Resources;
 using System.Threading.Tasks;
 using LibVLCSharp.Forms.Shared.Resources;
 using LibVLCSharp.Shared;
 using LibVLCSharp.Shared.MediaPlayerElement;
+using LibVLCSharp.Shared.Structures;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -93,7 +95,7 @@ namespace LibVLCSharp.Forms.Shared
             stateManager.Playing += (sender, e) => OnPlaying();
             stateManager.Paused += (sender, e) => OnStoppedOrPaused();
             stateManager.Stopped += (sender, e) => OnStoppedOrPaused();
-            stateManager.PlayPauseAvailableChanged += (sender, e) => UpdatePauseAvailability();         
+            stateManager.PlayPauseAvailableChanged += (sender, e) => UpdatePauseAvailability();
         }
 
         /// <summary>
@@ -105,23 +107,26 @@ namespace LibVLCSharp.Forms.Shared
         }
 
         private MediaPlayerElementManager Manager { get; }
-        private Button? AudioTracksSelectionButton { get; set; }
         private Button? TracksButton { get; set; }
-        private Button? VideoTracksSelectionButton { get; set; }
         private Button? CastButton { get; set; }
-        private Button? ClosedCaptionsSelectionButton { get; set; }
         private VisualElement? ControlsPanel { get; set; }
         private VisualElement? ButtonBar { get; set; }
         private VisualElement? UnLockControlsPanel { get; set; }
         private VisualElement? TracksOverLayView { get; set; }
         private SwipeToUnLockView? SwipeToUnLock { get; set; }
         private Label? TrackBarLabel { get; set; }
+        private Label? AudioTracksLabel { get; set; }
+        private Label? VideoTracksLabel { get; set; }
+        private Label? SubtileTracksLabel { get; set; }
         private Button? PlayPauseButton { get; set; }
         private Label? RemainingTimeLabel { get; set; }
         private Label? ElapsedTimeLabel { get; set; }
         private Label? AspectRatioLabel { get; set; }
 
         private Slider? SeekBar { get; set; }
+        private ListView? AudioTracksListView { get; set; }
+        private ListView? VideoTracksListView { get; set; }
+        private ListView? SubtitlesTracksListView { get; set; }
         private bool ScreenLockModeEnable { get; set; } = false;
 
         private bool Initialized { get; set; }
@@ -786,10 +791,7 @@ namespace LibVLCSharp.Forms.Shared
         private void OnApplyCustomTemplate()
         {
             TracksButton = SetClickEventHandler(nameof(TracksButton), TracksButton_Clicked);
-            AudioTracksSelectionButton = SetClickEventHandler(nameof(AudioTracksSelectionButton), AudioTracksSelectionButton_ClickedAsync);
-            VideoTracksSelectionButton = SetClickEventHandler(nameof(VideoTracksSelectionButton), VideoTracksSelectionButton_ClickedAsync);
             CastButton = SetClickEventHandler(nameof(CastButton), CastButton_ClickedAsync);
-            ClosedCaptionsSelectionButton = SetClickEventHandler(nameof(ClosedCaptionsSelectionButton), ClosedCaptionsSelectionButton_ClickedAsync);
             PlayPauseButton = SetClickEventHandler(nameof(PlayPauseButton), PlayPauseButton_Clicked);
             SetClickEventHandler("StopButton", StopButton_Clicked);
             SetClickEventHandler("LockButton", LockButton_ClickedAsync);
@@ -800,7 +802,19 @@ namespace LibVLCSharp.Forms.Shared
             TracksOverLayView = this.FindChild<VisualElement?>(nameof(TracksOverLayView));
             SwipeToUnLock = this.FindChild<SwipeToUnLockView?>(nameof(SwipeToUnLock));
             SeekBar = this.FindChild<Slider?>(nameof(SeekBar));
+            AudioTracksListView = this.FindChild<ListView?>(nameof(AudioTracksListView));
+            if (AudioTracksListView != null)
+                AudioTracksListView.ItemTapped += AudioTracksItemTapped;
+            VideoTracksListView = this.FindChild<ListView?>(nameof(VideoTracksListView));
+            if (VideoTracksListView != null)
+                VideoTracksListView.ItemTapped += VideoTracksItemTapped;
+            SubtitlesTracksListView = this.FindChild<ListView?>(nameof(SubtitlesTracksListView));
+            if (SubtitlesTracksListView != null)
+                SubtitlesTracksListView.ItemTapped += SubtitlesTracksItemTapped;
             TrackBarLabel = this.FindChild<Label?>(nameof(TrackBarLabel));
+            AudioTracksLabel = this.FindChild<Label?>(nameof(AudioTracksLabel));
+            VideoTracksLabel = this.FindChild<Label?>(nameof(VideoTracksLabel));
+            SubtileTracksLabel = this.FindChild<Label?>(nameof(SubtileTracksLabel));
             RemainingTimeLabel = this.FindChild<Label?>(nameof(RemainingTimeLabel));
             ElapsedTimeLabel = this.FindChild<Label?>(nameof(ElapsedTimeLabel));
             AspectRatioLabel = this.FindChild<Label?>(nameof(AspectRatioLabel));
@@ -815,6 +829,12 @@ namespace LibVLCSharp.Forms.Shared
 
             if (TrackBarLabel != null)
                 TrackBarLabel.Text = ResourceManager.GetString(nameof(Strings.Unlock));
+            if(AudioTracksLabel != null && VideoTracksLabel != null && SubtileTracksLabel != null)
+            {
+                AudioTracksLabel.Text = ResourceManager.GetString(nameof(Strings.AudioTracks));
+                VideoTracksLabel.Text = ResourceManager.GetString(nameof(Strings.VideoTracks));
+                SubtileTracksLabel.Text = ResourceManager.GetString(nameof(Strings.ClosedCaptions));
+            }
 
             if (SwipeToUnLock != null)
                 SwipeToUnLock.SlideCompleted += Handle_SlideCompletedAsync;
@@ -893,23 +913,116 @@ namespace LibVLCSharp.Forms.Shared
             UpdateClosedCaptionsTracksSelectionAvailability();
         }
 
+
         private void TracksButton_Clicked(object sender, EventArgs e)
         {
-            if(ButtonBar != null && TracksOverLayView != null)
+            if (ControlsPanel != null)
+                ControlsPanel.IsVisible = false;
+            var audioTrackSouces = LoadTracks(Manager.Get<AudioTracksManager>());
+            var videoTrackSouces = LoadTracks(Manager.Get<VideoTracksManager>());
+            var subtitleTracksSources = LoadTracks(Manager.Get<SubtitlesTracksManager>());
+            if (AudioTracksListView != null && VideoTracksListView != null && SubtitlesTracksListView != null)
             {
-                ButtonBar.IsVisible = false;
+                AudioTracksListView.ItemsSource = audioTrackSouces;
+                VideoTracksListView.ItemsSource = videoTrackSouces;
+                SubtitlesTracksListView.ItemsSource = subtitleTracksSources;
+            }
+
+            if (TracksOverLayView != null)
                 TracksOverLayView.IsVisible = true;
+        }
+
+        private void AudioTracksItemTapped(object sender, ItemTappedEventArgs e)
+        {
+            var track = (TrackDescription)e.Item;
+            var manager = Manager.Get<AudioTracksManager>();
+            SelectTrack(manager, track, AudioTracksListView);
+        }
+
+        private void VideoTracksItemTapped(object sender, ItemTappedEventArgs e)
+        {
+            var track = (TrackDescription)e.Item;
+            var manager = Manager.Get<VideoTracksManager>();
+            SelectTrack(manager, track, VideoTracksListView);
+        }
+
+        private void SubtitlesTracksItemTapped(object sender, ItemTappedEventArgs e)
+        {
+            var track = (TrackDescription)e.Item;
+            var manager = Manager.Get<SubtitlesTracksManager>();
+            SelectTrack(manager, track, SubtitlesTracksListView);
+        }
+
+        private void SelectTrack(TracksManager manager, TrackDescription track, ListView? tracksListview)
+        {
+            var tracks = manager.Tracks;
+            var currentTrackId = manager.CurrentTrackId;
+            if (tracks == null || track.Name.Contains("*"))
+                return;
+            var found = false;
+            var index = 0;
+            foreach (var trackDescription in tracks)
+            {
+                index += 1;
+                if (GetTrackName(trackDescription, currentTrackId) == track.Name)
+                {
+                    found = true;
+                    manager.CurrentTrackId = trackDescription.Id;
+                    UpdateTracksListviewItemsSource(track, tracksListview);
+                    break;
+                }
+            }
+            if (!found)
+            {
+                manager.CurrentTrackId = -1;
             }
         }
 
-        private async void AudioTracksSelectionButton_ClickedAsync(object sender, EventArgs e)
+        private void UpdateTracksListviewItemsSource(TrackDescription selectedTrack, ListView? trackListView)
         {
-            await SelectTrackAsync(Manager.Get<AudioTracksManager>(), ResourceManager.GetString(nameof(Strings.AudioTracks)));
-        }        
+            if (trackListView != null)
+            {
+                var itemSources = (ObservableCollection<TrackDescription>)trackListView.ItemsSource;
+                var previousTrack = itemSources.FirstOrDefault(t => t.Name[t.Name.Length - 1] == '*');
 
-        private async void VideoTracksSelectionButton_ClickedAsync(object sender, EventArgs e)
+                // Put "*" at the end of the selected track
+                itemSources.RemoveAt(selectedTrack.Id);
+                itemSources.Insert(selectedTrack.Id, new TrackDescription(selectedTrack.Id, $"{selectedTrack.Name} *"));
+
+                // Remove the "*" at the end of the previous track
+                var trackname = previousTrack.Name.Substring(0, previousTrack.Name.Length - 2);
+                itemSources.RemoveAt(previousTrack.Id);
+                itemSources.Insert(previousTrack.Id, new TrackDescription(previousTrack.Id, trackname));
+            }
+        }
+
+        private string GetTrackName(TrackDescription track, int currentTrackId)
         {
-            await SelectTrackAsync(Manager.Get<VideoTracksManager>(), ResourceManager.GetString(nameof(Strings.VideoTracks)));
+            return track.Id == currentTrackId ? $"{track.Name} *" : track.Name;
+        }
+
+        private ObservableCollection<TrackDescription> LoadTracks(TracksManager manager)
+        {
+            var allTracks = new ObservableCollection<TrackDescription>();
+            var tracks = manager.Tracks;
+            try
+            {
+                var currentTrackId = manager.CurrentTrackId;
+                var index = -1;
+                if (tracks != null)
+                {
+                    foreach (var track in tracks)
+                    {
+                        index += 1;
+                        allTracks.Add(new TrackDescription(index, GetTrackName(track, currentTrackId)));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowErrorMessageBox(ex);
+            }
+            return allTracks;
         }
 
         private async void CastButton_ClickedAsync(object sender, EventArgs e)
@@ -961,10 +1074,6 @@ namespace LibVLCSharp.Forms.Shared
             Show();
         }
 
-        private async void ClosedCaptionsSelectionButton_ClickedAsync(object sender, EventArgs e)
-        {
-            await SelectTrackAsync(Manager.Get<SubtitlesTracksManager>(), ResourceManager.GetString(nameof(Strings.ClosedCaptions)), true);
-        }
 
         private void PlayPauseButton_Clicked(object sender, EventArgs e)
         {
@@ -995,6 +1104,7 @@ namespace LibVLCSharp.Forms.Shared
             {
                 ShowErrorMessageBox(ex);
             }
+
         }
 
         private void RewindButton_Clicked(object sender, EventArgs e)
@@ -1051,65 +1161,11 @@ namespace LibVLCSharp.Forms.Shared
         private void OnStoppedOrPaused()
         {
             VisualStateManager.GoToState(PlayPauseButton, PlayState);
-        }            
+        }
 
         private string? GetTrackName(string? trackName, int trackId, int currentTrackId)
         {
             return trackId == currentTrackId ? $"{trackName} *" : trackName;
-        }
-
-        private async Task SelectTrackAsync(TracksManager manager, string popupTitle, bool addDeactivateRow = false)
-        {
-            var tracks = manager.Tracks;
-            if (tracks == null)
-            {
-                return;
-            }
-
-            try
-            {
-                var currentTrackId = manager.CurrentTrackId;
-                var index = 0;
-                IEnumerable<string?> tracksNames = tracks.Select(t =>
-                {
-                    index += 1;
-                    return GetTrackName(t.Name, currentTrackId, index);
-                }).OrderBy(n => n);
-                if (addDeactivateRow)
-                {
-                    tracksNames = new[] { GetTrackName(ResourceManager.GetString(nameof(Strings.Disable)), -1, currentTrackId) }
-                        .Union(tracksNames);
-                }
-
-                var page = this.FindAncestor<Page>();
-                if (page == null)
-                    return;
-
-                var trackName = await page.DisplayActionSheet(popupTitle, null, null, tracksNames.ToArray());
-                if (trackName != null)
-                {
-                    var found = false;
-                    index = 0;
-                    foreach (var trackDescription in tracks)
-                    {
-                        index += 1;
-                        if (GetTrackName(trackDescription.Name, currentTrackId, index) == trackName)
-                        {
-                            found = true;
-                            manager.CurrentTrackId = trackDescription.Id;
-                            break;
-                        }
-                    }
-                    if (!found)
-                    {
-                        manager.CurrentTrackId = -1;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                ShowErrorMessageBox(ex);
-            }
         }
 
         private void UpdateTracksSelectionButtonAvailability(Button? tracksSelectionButton, string state)
@@ -1133,19 +1189,19 @@ namespace LibVLCSharp.Forms.Shared
 
         private void UpdateAudioTracksSelectionAvailability()
         {
-            UpdateTracksSelectionAvailability(Manager.Get<AudioTracksManager>(), AudioTracksSelectionButton, IsAudioTracksSelectionButtonVisible,
+            UpdateTracksSelectionAvailability(Manager.Get<AudioTracksManager>(), TracksButton, IsAudioTracksSelectionButtonVisible,
                 AudioSelectionAvailableState, AudioSelectionUnavailableState, 2);
         }
 
         private void UpdateVideoTracksSelectionAvailability()
         {
-            UpdateTracksSelectionAvailability(Manager.Get<VideoTracksManager>(), VideoTracksSelectionButton, IsVideoTracksSelectionButtonVisible,
+            UpdateTracksSelectionAvailability(Manager.Get<VideoTracksManager>(), TracksButton, IsVideoTracksSelectionButtonVisible,
                 VideoSelectionAvailableState, VideoSelectionUnavailableState, 2);
         }
 
         private void UpdateClosedCaptionsTracksSelectionAvailability()
         {
-            UpdateTracksSelectionAvailability(Manager.Get<SubtitlesTracksManager>(), ClosedCaptionsSelectionButton,
+            UpdateTracksSelectionAvailability(Manager.Get<SubtitlesTracksManager>(), TracksButton,
                 IsClosedCaptionsSelectionButtonVisible, ClosedCaptionsSelectionAvailableState, ClosedCaptionsSelectionUnavailableState, 1);
         }
 
@@ -1298,6 +1354,9 @@ namespace LibVLCSharp.Forms.Shared
             }
             if (UnLockControlsPanel != null)
                 UnLockControlsPanel.IsVisible = false;
+
+            /*if (TracksOverLayView != null && TracksOverLayView.IsVisible == true)
+                TracksOverLayView.IsVisible = false;*/
 
             var systemUI = SystemUI;
             if (systemUI != null)
