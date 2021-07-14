@@ -265,6 +265,7 @@
     <Style x:Key="TracksListViewStyle" TargetType="ListView">
         <Setter Property="Margin" Value="5, 0, 0, 0" />
         <Setter Property="SeparatorColor" Value="Transparent" />
+        <Setter Property="BackgroundColor" Value="#7F000000" />
         <Setter Property="SeparatorVisibility" Value="None" />
         <Setter Property="HasUnevenRows" Value="False" />
     </Style>

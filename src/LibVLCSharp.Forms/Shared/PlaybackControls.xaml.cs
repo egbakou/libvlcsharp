@@ -1355,9 +1355,6 @@ namespace LibVLCSharp.Forms.Shared
             if (UnLockControlsPanel != null)
                 UnLockControlsPanel.IsVisible = false;
 
-            /*if (TracksOverLayView != null && TracksOverLayView.IsVisible == true)
-                TracksOverLayView.IsVisible = false;*/
-
             var systemUI = SystemUI;
             if (systemUI != null)
             {
