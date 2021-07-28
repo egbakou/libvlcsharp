@@ -130,42 +130,6 @@
         </Style.Triggers>
     </Style>
 
-    <Style x:Key="AudioTracksSelectionButtonStyle" BasedOn="{StaticResource ButtonStyle}" TargetType="Button">
-        <Setter Property="IsVisible" Value="{TemplateBinding IsAudioTracksSelectionButtonVisible}" />
-        <Setter Property="FontFamily" Value="{StaticResource FontAwesomeRegular}" />
-        <Setter Property="Text" Value="{x:Static fontawesome:FontAwesomeIcons.FileAudio}" />
-        <Setter Property="VisualStateManager.VisualStateGroups">
-            <VisualStateGroupList>
-                <VisualStateGroup x:Name="AudioSelectionAvailabilityStates">
-                    <VisualState x:Name="AudioSelectionAvailable">
-                        <VisualState.Setters>
-                            <Setter Property="IsVisible" Value="True" />
-                        </VisualState.Setters>
-                    </VisualState>
-                    <VisualState x:Name="AudioSelectionUnavailable" />
-                </VisualStateGroup>
-            </VisualStateGroupList>
-        </Setter>
-    </Style>
-
-    <Style x:Key="VideoTracksSelectionButtonStyle" BasedOn="{StaticResource ButtonStyle}" TargetType="Button">
-        <Setter Property="IsVisible" Value="{TemplateBinding IsVideoTracksSelectionButtonVisible}" />
-        <Setter Property="FontFamily" Value="{StaticResource FontAwesomeRegular}" />
-        <Setter Property="Text" Value="{x:Static fontawesome:FontAwesomeIcons.FileVideo}" />
-        <Setter Property="VisualStateManager.VisualStateGroups">
-            <VisualStateGroupList>
-                <VisualStateGroup x:Name="VideoSelectionAvailabilityStates">
-                    <VisualState x:Name="VideoSelectionAvailable">
-                        <VisualState.Setters>
-                            <Setter Property="IsVisible" Value="True" />
-                        </VisualState.Setters>
-                    </VisualState>
-                    <VisualState x:Name="VideoSelectionUnavailable" />
-                </VisualStateGroup>
-            </VisualStateGroupList>
-        </Setter>
-    </Style>
-
     <Style x:Key="CastButtonStyle" BasedOn="{StaticResource ButtonStyle}" TargetType="Button">
         <Setter Property="IsVisible" Value="False" />
         <Setter Property="FontFamily" Value="{StaticResource FontAwesomeBrands}" />
@@ -179,24 +143,6 @@
                         </VisualState.Setters>
                     </VisualState>
                     <VisualState x:Name="CastUnavailable" />
-                </VisualStateGroup>
-            </VisualStateGroupList>
-        </Setter>
-    </Style>
-
-    <Style x:Key="ClosedCaptionsSelectionButtonStyle" BasedOn="{StaticResource ButtonStyle}" TargetType="Button">
-        <Setter Property="IsVisible" Value="{TemplateBinding IsClosedCaptionsSelectionButtonVisible}" />
-        <Setter Property="Text" Value="{x:Static fontawesome:FontAwesomeIcons.ClosedCaptioning}" />
-        <Setter Property="FontFamily" Value="{StaticResource FontAwesomeRegular}" />
-        <Setter Property="VisualStateManager.VisualStateGroups">
-            <VisualStateGroupList>
-                <VisualStateGroup x:Name="ClosedCaptionsSelectionAvailabilityStates">
-                    <VisualState x:Name="ClosedCaptionsSelectionAvailable" />
-                    <VisualState x:Name="ClosedCaptionsSelectionUnavailable">
-                        <VisualState.Setters>
-                            <Setter Property="IsVisible" Value="False" />
-                        </VisualState.Setters>
-                    </VisualState>
                 </VisualStateGroup>
             </VisualStateGroupList>
         </Setter>

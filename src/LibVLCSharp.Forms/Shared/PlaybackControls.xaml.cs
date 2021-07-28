@@ -44,12 +44,9 @@ namespace LibVLCSharp.Forms.Shared
             Foreground = (Color)(Resources[nameof(Foreground)] ?? Color.White);
             MainColor = (Color)(Resources[nameof(MainColor)] ?? Color.Transparent);
             TracksButtonStyle = Resources[nameof(TracksButtonStyle)] as Style;
-            AudioTracksSelectionButtonStyle = Resources[nameof(AudioTracksSelectionButtonStyle)] as Style;
-            VideoTracksSelectionButtonStyle = Resources[nameof(VideoTracksSelectionButtonStyle)] as Style;
             BufferingProgressBarStyle = Resources[nameof(BufferingProgressBarStyle)] as Style;
             ButtonBarStyle = Resources[nameof(ButtonBarStyle)] as Style;
             CastButtonStyle = Resources[nameof(CastButtonStyle)] as Style;
-            ClosedCaptionsSelectionButtonStyle = Resources[nameof(ClosedCaptionsSelectionButtonStyle)] as Style;
             ControlsPanelStyle = Resources[nameof(ControlsPanelStyle)] as Style;
             MessageStyle = Resources[nameof(MessageStyle)] as Style;
             PlayPauseButtonStyle = Resources[nameof(PlayPauseButtonStyle)] as Style;
@@ -194,33 +191,6 @@ namespace LibVLCSharp.Forms.Shared
             set => SetValue(TracksButtonStyleProperty, value);
         }
 
-        /// <summary>
-        /// Identifies the <see cref="AudioTracksSelectionButtonStyle"/> dependency property.
-        /// </summary>
-        public static readonly BindableProperty AudioTracksSelectionButtonStyleProperty = BindableProperty.Create(
-            nameof(AudioTracksSelectionButtonStyle), typeof(Style), typeof(PlaybackControls));
-        /// <summary>
-        /// Gets or sets the audio tracks selection button style.
-        /// </summary>
-        public Style? AudioTracksSelectionButtonStyle
-        {
-            get => (Style)GetValue(AudioTracksSelectionButtonStyleProperty);
-            set => SetValue(AudioTracksSelectionButtonStyleProperty, value);
-        }
-
-        /// <summary>
-        /// Identifies the <see cref="VideoTracksSelectionButtonStyle"/> dependency property.
-        /// </summary>
-        public static readonly BindableProperty VideoTracksSelectionButtonStyleProperty = BindableProperty.Create(
-            nameof(VideoTracksSelectionButtonStyle), typeof(Style), typeof(PlaybackControls));
-        /// <summary>
-        /// Gets or sets the audio tracks selection button style.
-        /// </summary>
-        public Style? VideoTracksSelectionButtonStyle
-        {
-            get => (Style)GetValue(VideoTracksSelectionButtonStyleProperty);
-            set => SetValue(VideoTracksSelectionButtonStyleProperty, value);
-        }
 
         /// <summary>
         /// Identifies the <see cref="BufferingProgressBarStyle"/> dependency property.
@@ -262,20 +232,6 @@ namespace LibVLCSharp.Forms.Shared
         {
             get => (Style)GetValue(CastButtonStyleProperty);
             set => SetValue(CastButtonStyleProperty, value);
-        }
-
-        /// <summary>
-        /// Identifies the <see cref="ClosedCaptionsSelectionButtonStyle"/> dependency property.
-        /// </summary>
-        public static readonly BindableProperty ClosedCaptionsSelectionButtonStyleProperty = BindableProperty.Create(
-            nameof(ClosedCaptionsSelectionButtonStyle), typeof(Style), typeof(PlaybackControls));
-        /// <summary>
-        /// Gets or sets the closed captions selection button style.
-        /// </summary>
-        public Style? ClosedCaptionsSelectionButtonStyle
-        {
-            get => (Style)GetValue(ClosedCaptionsSelectionButtonStyleProperty);
-            set => SetValue(ClosedCaptionsSelectionButtonStyleProperty, value);
         }
 
         /// <summary>
@@ -1196,7 +1152,7 @@ namespace LibVLCSharp.Forms.Shared
         private void UpdateVideoTracksSelectionAvailability()
         {
             UpdateTracksSelectionAvailability(Manager.Get<VideoTracksManager>(), TracksButton, IsVideoTracksSelectionButtonVisible,
-                VideoSelectionAvailableState, VideoSelectionUnavailableState, 2);
+                VideoSelectionAvailableState, VideoSelectionUnavailableState, 3);
         }
 
         private void UpdateClosedCaptionsTracksSelectionAvailability()
