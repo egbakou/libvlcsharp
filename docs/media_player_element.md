@@ -4,6 +4,7 @@
   <img src="/src/assets/media-element.png"/>
 </h3>
 
+
 ## Getting started
 
 The best way to get started is to use the samples https://code.videolan.org/videolan/LibVLCSharp/-/tree/3.x/samples/Forms/LibVLCSharp.Forms.MediaElement
@@ -16,8 +17,8 @@ It already has the fonts (that are needed for icons) and necessary setup for cus
 - Play/Pause button
 - Seekbar
 - Volume / Mute
-- Closed captions selection
-- Audio tracks selection
+- Tracks selection (Audio and Video) and Closed captions selection
+- Lock Screen button
 - Aspect ratio button
 - Zoom button
 - Cast button
