@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using LibVLCSharp.Forms.Shared.Resources;
 using LibVLCSharp.Shared;
 using LibVLCSharp.Shared.MediaPlayerElement;
-using LibVLCSharp.Shared.Structures;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -109,7 +108,7 @@ namespace LibVLCSharp.Forms.Shared
         private VisualElement? ControlsPanel { get; set; }
         private VisualElement? ButtonBar { get; set; }
         private VisualElement? UnLockControlsPanel { get; set; }
-        private VisualElement? TracksOverLayView { get; set; }
+        private VisualElement? TracksOverlayView { get; set; }
         private SwipeToUnLockView? SwipeToUnLock { get; set; }
         private Label? TrackBarLabel { get; set; }
         private Label? AudioTracksLabel { get; set; }
@@ -755,7 +754,7 @@ namespace LibVLCSharp.Forms.Shared
             ControlsPanel = this.FindChild<VisualElement?>(nameof(ControlsPanel));
             ButtonBar = this.FindChild<VisualElement?>(nameof(ButtonBar));
             UnLockControlsPanel = this.FindChild<VisualElement?>(nameof(UnLockControlsPanel));
-            TracksOverLayView = this.FindChild<VisualElement?>(nameof(TracksOverLayView));
+            TracksOverlayView = this.FindChild<VisualElement?>(nameof(TracksOverlayView));
             SwipeToUnLock = this.FindChild<SwipeToUnLockView?>(nameof(SwipeToUnLock));
             SeekBar = this.FindChild<Slider?>(nameof(SeekBar));
             AudioTracksListView = this.FindChild<ListView?>(nameof(AudioTracksListView));
@@ -884,82 +883,65 @@ namespace LibVLCSharp.Forms.Shared
                 SubtitlesTracksListView.ItemsSource = subtitleTracksSources;
             }
 
-            if (TracksOverLayView != null)
-                TracksOverLayView.IsVisible = true;
+            if (TracksOverlayView != null)
+                TracksOverlayView.IsVisible = true;
         }
 
         private void AudioTracksItemTapped(object sender, ItemTappedEventArgs e)
         {
-            var track = (TrackDescription)e.Item;
+            var track = (TrackViewModel)e.Item;
             var manager = Manager.Get<AudioTracksManager>();
             SelectTrack(manager, track, AudioTracksListView);
         }
 
         private void VideoTracksItemTapped(object sender, ItemTappedEventArgs e)
         {
-            var track = (TrackDescription)e.Item;
+            var track = (TrackViewModel)e.Item;
             var manager = Manager.Get<VideoTracksManager>();
             SelectTrack(manager, track, VideoTracksListView);
         }
 
         private void SubtitlesTracksItemTapped(object sender, ItemTappedEventArgs e)
         {
-            var track = (TrackDescription)e.Item;
+            var track = (TrackViewModel)e.Item;
             var manager = Manager.Get<SubtitlesTracksManager>();
             SelectTrack(manager, track, SubtitlesTracksListView);
         }
 
-        private void SelectTrack(TracksManager manager, TrackDescription track, ListView? tracksListview)
+        private void SelectTrack(TracksManager manager, TrackViewModel track, ListView? tracksListview)
         {
             var tracks = manager.Tracks;
             var currentTrackId = manager.CurrentTrackId;
-            if (tracks == null || track.Name.Contains("*"))
+            if (tracks == null || track.Selected)
                 return;
-            var found = false;
-            var index = 0;
-            foreach (var trackDescription in tracks)
+
+            var foundTrack = tracks.FirstOrDefault(t => t.Name == track.Name);
+            if (foundTrack.Name != null)
             {
-                index += 1;
-                if (GetTrackName(trackDescription, currentTrackId) == track.Name)
-                {
-                    found = true;
-                    manager.CurrentTrackId = trackDescription.Id;
-                    UpdateTracksListviewItemsSource(track, tracksListview);
-                    break;
-                }
+                manager.CurrentTrackId = foundTrack.Id;
+                UpdateTracksListviewItemsSource(track, tracksListview);
             }
-            if (!found)
+            else
             {
                 manager.CurrentTrackId = -1;
             }
         }
 
-        private void UpdateTracksListviewItemsSource(TrackDescription selectedTrack, ListView? trackListView)
+        private void UpdateTracksListviewItemsSource(TrackViewModel selectedTrack, ListView? trackListView)
         {
             if (trackListView != null)
             {
-                var itemSources = (ObservableCollection<TrackDescription>)trackListView.ItemsSource;
-                var previousTrack = itemSources.FirstOrDefault(t => t.Name[t.Name.Length - 1] == '*');
+                var itemSources = (ObservableCollection<TrackViewModel>)trackListView.ItemsSource;
+                var previousTrack = itemSources.FirstOrDefault(t => t.Selected);
 
-                // Put "*" at the end of the selected track
-                itemSources.RemoveAt(selectedTrack.Id);
-                itemSources.Insert(selectedTrack.Id, new TrackDescription(selectedTrack.Id, $"{selectedTrack.Name} *"));
-
-                // Remove the "*" at the end of the previous track
-                var trackname = previousTrack.Name.Substring(0, previousTrack.Name.Length - 2);
-                itemSources.RemoveAt(previousTrack.Id);
-                itemSources.Insert(previousTrack.Id, new TrackDescription(previousTrack.Id, trackname));
+                itemSources.ElementAt(previousTrack.Id).Selected = false;
+                itemSources.ElementAt(selectedTrack.Id).Selected = true;
             }
         }
 
-        private string GetTrackName(TrackDescription track, int currentTrackId)
+        private ObservableCollection<TrackViewModel> LoadTracks(TracksManager manager)
         {
-            return track.Id == currentTrackId ? $"{track.Name} *" : track.Name;
-        }
-
-        private ObservableCollection<TrackDescription> LoadTracks(TracksManager manager)
-        {
-            var allTracks = new ObservableCollection<TrackDescription>();
+            var allTracks = new ObservableCollection<TrackViewModel>();
             var tracks = manager.Tracks;
             try
             {
@@ -970,7 +952,11 @@ namespace LibVLCSharp.Forms.Shared
                     foreach (var track in tracks)
                     {
                         index += 1;
-                        allTracks.Add(new TrackDescription(index, GetTrackName(track, currentTrackId)));
+                        var trackViewModel = new TrackViewModel(index, track.Name);
+
+                        if (track.Id == currentTrackId)
+                            trackViewModel.Selected = true;
+                        allTracks.Add(trackViewModel);
                     }
                 }
             }
@@ -1117,11 +1103,6 @@ namespace LibVLCSharp.Forms.Shared
         private void OnStoppedOrPaused()
         {
             VisualStateManager.GoToState(PlayPauseButton, PlayState);
-        }
-
-        private string? GetTrackName(string? trackName, int trackId, int currentTrackId)
-        {
-            return trackId == currentTrackId ? $"{trackName} *" : trackName;
         }
 
         private void UpdateTracksSelectionButtonAvailability(Button? tracksSelectionButton, string state)
@@ -1274,7 +1255,7 @@ namespace LibVLCSharp.Forms.Shared
         private async Task FadeInAsync()
         {
             var controlsPanel = ControlsPanel;
-            if (controlsPanel != null && SeekBar != null && ButtonBar != null && UnLockControlsPanel != null && TracksOverLayView != null)
+            if (controlsPanel != null && SeekBar != null && ButtonBar != null && UnLockControlsPanel != null && TracksOverlayView != null)
             {
                 controlsPanel.IsVisible = true;
                 SeekBar.IsVisible = true;
@@ -1283,8 +1264,8 @@ namespace LibVLCSharp.Forms.Shared
                 ButtonBar.IsVisible = !ScreenLockModeEnable;
                 UnLockControlsPanel.IsVisible = ScreenLockModeEnable;
 
-                if (TracksOverLayView.IsVisible)
-                    TracksOverLayView.IsVisible = false;
+                if (TracksOverlayView.IsVisible)
+                    TracksOverlayView.IsVisible = false;
 
                 if (controlsPanel.Opacity != 1)
                 {

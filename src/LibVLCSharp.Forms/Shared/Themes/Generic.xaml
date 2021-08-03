@@ -2,6 +2,7 @@
 <ResourceDictionary xmlns="http://xamarin.com/schemas/2014/forms" 
                     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                     xmlns:converters="clr-namespace:LibVLCSharp.Forms.Shared.Converters"
+                    xmlns:customControls="clr-namespace:LibVLCSharp.Forms.Shared"
                     xmlns:effects="clr-namespace:LibVLCSharp.Forms.Shared.Effects"
                     xmlns:fontawesome="clr-namespace:FontAwesome;assembly=LibVLCSharp"
                     xmlns:local="clr-namespace:LibVLCSharp.Forms.Shared"
@@ -208,7 +209,6 @@
     </Style>
 
     <Style x:Key="TracksListViewStyle" TargetType="ListView">
-        <Setter Property="Margin" Value="5, 0, 0, 0" />
         <Setter Property="SeparatorColor" Value="Transparent" />
         <Setter Property="SeparatorVisibility" Value="None" />
         <Setter Property="BackgroundColor">
@@ -218,13 +218,47 @@
                 </OnPlatform>
             </Setter.Value>
         </Setter>
+        <Setter Property="RowHeight">
+            <Setter.Value>
+                <OnIdiom x:TypeArguments="x:Int32" Phone="40" Tablet="40" />
+            </Setter.Value>
+        </Setter>
         <Setter Property="HasUnevenRows" Value="False" />
+        <Setter Property="SelectionMode" Value="None" />
     </Style>
 
     <Style x:Key="TrackNameLabelStyle" TargetType="Label">
         <Setter Property="TextColor" Value="White" />
-        <Setter Property="Margin" Value="5, 0, 0, 0" />
+        <Setter Property="VerticalOptions" Value="End" />
     </Style>
+
+    <Style x:Key="CheckedTrackStyle" TargetType="Button">
+        <Setter Property="FontFamily" Value="{StaticResource FontAwesomeSolid}" />
+        <Setter Property="Text" Value="{x:Static fontawesome:FontAwesomeIcons.Check}" />
+        <Setter Property="TextColor" Value="#FE8A03" />
+        <Setter Property="BackgroundColor" Value="Transparent" />
+        <Setter Property="WidthRequest" Value="40" />
+        <Setter Property="FontSize" Value="14" />
+    </Style>
+    
+    <Style x:Key="TrackViewCellStyle" TargetType="StackLayout">
+        <Setter Property="Orientation" Value="Horizontal" />
+        <Setter Property="HorizontalOptions" Value="FillAndExpand" />
+        <Setter Property="VerticalOptions" Value="Center" />
+    </Style>
+    
+    <DataTemplate x:Key="TrackViewCellDataTemplate">
+        <ViewCell>
+            <StackLayout Style="{StaticResource TrackViewCellStyle}">
+                <StackLayout WidthRequest="30" Orientation="Horizontal" VerticalOptions="Center">
+                    <Button Style="{StaticResource CheckedTrackStyle}" IsVisible="{Binding Selected}" />
+                </StackLayout>
+                <StackLayout Orientation="Horizontal" VerticalOptions="Center">
+                    <Label Style="{StaticResource TrackNameLabelStyle}" Text="{Binding Name}" />
+                </StackLayout>
+            </StackLayout>
+        </ViewCell>
+    </DataTemplate>
 
     <Style x:Key="PlaybackControlsStyle" TargetType="TemplatedView">
         <Setter Property="ControlTemplate">
@@ -291,53 +325,20 @@
                     </StackLayout>
 
                     <!-- Overlay -->
-                    <ContentView HeightRequest="300" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" x:Name="TracksOverLayView" AbsoluteLayout.LayoutBounds="0, 0, 1, 1"  AbsoluteLayout.LayoutFlags="All" IsVisible="False" BackgroundColor="#7F000000">
+                    <ContentView HeightRequest="300" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" x:Name="TracksOverlayView" AbsoluteLayout.LayoutBounds="0, 0, 1, 1"  AbsoluteLayout.LayoutFlags="All" IsVisible="False" BackgroundColor="#7F000000">
                         <ScrollView VerticalScrollBarVisibility="Never" HorizontalOptions="FillAndExpand" VerticalOptions="Fill" Orientation="Vertical">
                             <Grid>
                                 <StackLayout Grid.Row="0" HorizontalOptions="FillAndExpand">
                                     <Label FontSize="18" TextColor="White" x:Name="AudioTracksLabel" />
-                                    <ListView x:Name="AudioTracksListView" Style="{StaticResource TracksListViewStyle}">
-                                        <ListView.RowHeight>
-                                            <OnIdiom x:TypeArguments="x:Int32" Phone="40" Tablet="40" />
-                                        </ListView.RowHeight>
-                                        <ListView.ItemTemplate>
-                                            <DataTemplate>
-                                                <ViewCell>
-                                                    <Label Style="{StaticResource TrackNameLabelStyle}" Text="{Binding Name}" />
-                                                </ViewCell>
-                                            </DataTemplate>
-                                        </ListView.ItemTemplate>
-                                    </ListView>
+                                    <ListView x:Name="AudioTracksListView" ItemTemplate="{StaticResource TrackViewCellDataTemplate}" Style="{StaticResource TracksListViewStyle}" />
                                 </StackLayout>
                                 <StackLayout Grid.Row="1" HorizontalOptions="FillAndExpand">
                                     <Label FontSize="18" TextColor="White" x:Name="VideoTracksLabel" />
-                                    <ListView x:Name="VideoTracksListView" Style="{StaticResource TracksListViewStyle}">
-                                        <ListView.RowHeight>
-                                            <OnIdiom x:TypeArguments="x:Int32" Phone="40" Tablet="40" />
-                                        </ListView.RowHeight>
-                                        <ListView.ItemTemplate>
-                                            <DataTemplate>
-                                                <ViewCell>
-                                                    <Label Style="{StaticResource TrackNameLabelStyle}" Text="{Binding Name}" />
-                                                </ViewCell>
-                                            </DataTemplate>
-                                        </ListView.ItemTemplate>
-                                    </ListView>
+                                    <ListView x:Name="VideoTracksListView" ItemTemplate="{StaticResource TrackViewCellDataTemplate}" Style="{StaticResource TracksListViewStyle}" />
                                 </StackLayout>
                                 <StackLayout Grid.Row="2" HorizontalOptions="FillAndExpand">
                                     <Label FontSize="18" TextColor="White" x:Name="SubtileTracksLabel" />
-                                    <ListView x:Name="SubtitlesTracksListView" Style="{StaticResource TracksListViewStyle}">
-                                        <ListView.RowHeight>
-                                            <OnIdiom x:TypeArguments="x:Int32" Phone="40" Tablet="40" />
-                                        </ListView.RowHeight>
-                                        <ListView.ItemTemplate>
-                                            <DataTemplate>
-                                                <ViewCell>
-                                                    <Label Style="{StaticResource TrackNameLabelStyle}" Text="{Binding Name}" />
-                                                </ViewCell>
-                                            </DataTemplate>
-                                        </ListView.ItemTemplate>
-                                    </ListView>
+                                    <ListView x:Name="SubtitlesTracksListView" ItemTemplate="{StaticResource TrackViewCellDataTemplate}" Style="{StaticResource TracksListViewStyle}" />
                                 </StackLayout>
                             </Grid>
                         </ScrollView>
