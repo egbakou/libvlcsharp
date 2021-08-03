@@ -2,7 +2,6 @@
 <ResourceDictionary xmlns="http://xamarin.com/schemas/2014/forms" 
                     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                     xmlns:converters="clr-namespace:LibVLCSharp.Forms.Shared.Converters"
-                    xmlns:customControls="clr-namespace:LibVLCSharp.Forms.Shared"
                     xmlns:effects="clr-namespace:LibVLCSharp.Forms.Shared.Effects"
                     xmlns:fontawesome="clr-namespace:FontAwesome;assembly=LibVLCSharp"
                     xmlns:local="clr-namespace:LibVLCSharp.Forms.Shared"
