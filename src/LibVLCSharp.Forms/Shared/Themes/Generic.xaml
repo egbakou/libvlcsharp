@@ -227,6 +227,11 @@
         <Setter Property="SelectionMode" Value="None" />
     </Style>
 
+    <Style x:Key="TrackTypeLabelStyle" TargetType="Label">
+        <Setter Property="FontSize" Value="18"/>
+        <Setter Property="TextColor" Value="White" />
+    </Style>
+    
     <Style x:Key="TrackNameLabelStyle" TargetType="Label">
         <Setter Property="TextColor" Value="White" />
         <Setter Property="VerticalOptions" Value="End" />
@@ -329,15 +334,15 @@
                         <ScrollView VerticalScrollBarVisibility="Never" HorizontalOptions="FillAndExpand" VerticalOptions="Fill" Orientation="Vertical">
                             <Grid>
                                 <StackLayout Grid.Row="0" HorizontalOptions="FillAndExpand">
-                                    <Label FontSize="18" TextColor="White" x:Name="AudioTracksLabel" />
+                                    <Label Style="{StaticResource TrackTypeLabelStyle}" x:Name="AudioTracksLabel" />
                                     <ListView x:Name="AudioTracksListView" ItemTemplate="{StaticResource TrackViewCellDataTemplate}" Style="{StaticResource TracksListViewStyle}" />
                                 </StackLayout>
                                 <StackLayout Grid.Row="1" HorizontalOptions="FillAndExpand">
-                                    <Label FontSize="18" TextColor="White" x:Name="VideoTracksLabel" />
+                                    <Label Style="{StaticResource TrackTypeLabelStyle}" x:Name="VideoTracksLabel" />
                                     <ListView x:Name="VideoTracksListView" ItemTemplate="{StaticResource TrackViewCellDataTemplate}" Style="{StaticResource TracksListViewStyle}" />
                                 </StackLayout>
                                 <StackLayout Grid.Row="2" HorizontalOptions="FillAndExpand">
-                                    <Label FontSize="18" TextColor="White" x:Name="SubtileTracksLabel" />
+                                    <Label Style="{StaticResource TrackTypeLabelStyle}" x:Name="SubtileTracksLabel" />
                                     <ListView x:Name="SubtitlesTracksListView" ItemTemplate="{StaticResource TrackViewCellDataTemplate}" Style="{StaticResource TracksListViewStyle}" />
                                 </StackLayout>
                             </Grid>
