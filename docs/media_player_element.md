@@ -1,8 +1,9 @@
 # MediaPlayerElement
 
 <h3 align="center">
-  <img src="/src/assets/media-element.png"/>
+  <img src="/src/assets/media-element.jpg"/>
 </h3>
+
 
 
 ## Getting started
