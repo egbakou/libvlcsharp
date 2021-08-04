@@ -219,7 +219,10 @@
         </Setter>
         <Setter Property="RowHeight">
             <Setter.Value>
-                <OnIdiom x:TypeArguments="x:Int32" Phone="40" Tablet="40" />
+                <OnPlatform x:TypeArguments="x:Int32">
+                    <On Platform="Android">40</On>
+                    <On Platform="iOS">50</On>
+                </OnPlatform>
             </Setter.Value>
         </Setter>
         <Setter Property="HasUnevenRows" Value="False" />
