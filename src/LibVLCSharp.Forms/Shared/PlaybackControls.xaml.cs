@@ -574,36 +574,6 @@ namespace LibVLCSharp.Forms.Shared
         }
 
         /// <summary>
-        /// Identifies the <see cref="IsAudioTracksSelectionButtonVisible"/> dependency property.
-        /// </summary>
-        public static readonly BindableProperty IsAudioTracksSelectionButtonVisibleProperty = BindableProperty.Create(
-            nameof(IsAudioTracksSelectionButtonVisible), typeof(bool), typeof(PlaybackControls), true,
-            propertyChanged: IsAudioTracksSelectionButtonVisiblePropertyChanged);
-        /// <summary>
-        /// Gets or sets a value indicating whether the audio tracks selection button is shown.
-        /// </summary>
-        public bool IsAudioTracksSelectionButtonVisible
-        {
-            get => (bool)GetValue(IsAudioTracksSelectionButtonVisibleProperty);
-            set => SetValue(IsAudioTracksSelectionButtonVisibleProperty, value);
-        }
-
-        /// <summary>
-        /// Identifies the <see cref="IsVideoTracksSelectionButtonVisible"/> dependency property.
-        /// </summary>
-        public static readonly BindableProperty IsVideoTracksSelectionButtonVisibleProperty = BindableProperty.Create(
-            nameof(IsVideoTracksSelectionButtonVisible), typeof(bool), typeof(PlaybackControls), true,
-            propertyChanged: IsVideoTracksSelectionButtonVisiblePropertyChanged);
-        /// <summary>
-        /// Gets or sets a value indicating whether the audio tracks selection button is shown.
-        /// </summary>
-        public bool IsVideoTracksSelectionButtonVisible
-        {
-            get => (bool)GetValue(IsVideoTracksSelectionButtonVisibleProperty);
-            set => SetValue(IsVideoTracksSelectionButtonVisibleProperty, value);
-        }
-
-        /// <summary>
         /// Identifies the <see cref="IsCastButtonVisible"/> dependency property.
         /// </summary>
         public static readonly BindableProperty IsCastButtonVisibleProperty = BindableProperty.Create(nameof(IsCastButtonVisible), typeof(bool),
@@ -615,21 +585,6 @@ namespace LibVLCSharp.Forms.Shared
         {
             get => (bool)GetValue(IsCastButtonVisibleProperty);
             set => SetValue(IsCastButtonVisibleProperty, value);
-        }
-
-        /// <summary>
-        /// Identifies the <see cref="IsClosedCaptionsSelectionButtonVisible"/> dependency property.
-        /// </summary>
-        public static readonly BindableProperty IsClosedCaptionsSelectionButtonVisibleProperty = BindableProperty.Create(
-            nameof(IsClosedCaptionsSelectionButtonVisible), typeof(bool), typeof(PlaybackControls), true,
-            propertyChanged: IsClosedCaptionsSelectionButtonVisiblePropertyChanged);
-        /// <summary>
-        /// Gets or sets a value indicating whether the closed captions selection button is shown.
-        /// </summary>
-        public bool IsClosedCaptionsSelectionButtonVisible
-        {
-            get => (bool)GetValue(IsClosedCaptionsSelectionButtonVisibleProperty);
-            set => SetValue(IsClosedCaptionsSelectionButtonVisibleProperty, value);
         }
 
         /// <summary>
@@ -1114,32 +1069,32 @@ namespace LibVLCSharp.Forms.Shared
         }
 
         private void UpdateTracksSelectionAvailability(TracksManager tracksManager, Button? tracksSelectionButton,
-            bool isTracksSelectionButtonVisible, string availableState, string unavailableState, int count)
+            string availableState, string unavailableState, int count)
         {
             if (tracksSelectionButton != null)
             {
                 var c = tracksManager.Tracks?.Where(t => t.Id != -1).Count();
-                UpdateTracksSelectionButtonAvailability(tracksSelectionButton, isTracksSelectionButtonVisible &&
+                UpdateTracksSelectionButtonAvailability(tracksSelectionButton,
                     tracksManager.Tracks?.Where(t => t.Id != -1).Count() >= count ? availableState : unavailableState);
             }
         }
 
         private void UpdateAudioTracksSelectionAvailability()
         {
-            UpdateTracksSelectionAvailability(Manager.Get<AudioTracksManager>(), TracksButton, IsAudioTracksSelectionButtonVisible,
+            UpdateTracksSelectionAvailability(Manager.Get<AudioTracksManager>(), TracksButton,
                 AudioSelectionAvailableState, AudioSelectionUnavailableState, 2);
         }
 
         private void UpdateVideoTracksSelectionAvailability()
         {
-            UpdateTracksSelectionAvailability(Manager.Get<VideoTracksManager>(), TracksButton, IsVideoTracksSelectionButtonVisible,
+            UpdateTracksSelectionAvailability(Manager.Get<VideoTracksManager>(), TracksButton,
                 VideoSelectionAvailableState, VideoSelectionUnavailableState, 3);
         }
 
         private void UpdateClosedCaptionsTracksSelectionAvailability()
         {
             UpdateTracksSelectionAvailability(Manager.Get<SubtitlesTracksManager>(), TracksButton,
-                IsClosedCaptionsSelectionButtonVisible, ClosedCaptionsSelectionAvailableState, ClosedCaptionsSelectionUnavailableState, 1);
+                ClosedCaptionsSelectionAvailableState, ClosedCaptionsSelectionUnavailableState, 1);
         }
 
         private void ShowError()
